@@ -1,37 +1,21 @@
 #!/usr/bin/python
 #Greg Fiske
 #WHOI_dial_data_to_google_spreadsheet.py
-#July 2016
+#Sept 2016
 
 # import modules
 try:
     import urllib, datetime
     from xml.etree import ElementTree as ET    
-    import psycopg2,sys, time
+    import sys, time
     import base64
     import ConfigParser
     import gspread
-    from oauth2client.client import SignedJwtAssertionCredentials
+    from oauth2client.service_account import ServiceAccountCredentials
     import json
 except:
     print "Cannot import a module"
 
-###############################################################
-config = ConfigParser.RawConfigParser()
-config.read('/home/gfiske/Data/python_scripts/gfiske.cfg')
-db_user = config.get('section1', 'db_user')
-db_passwd = config.get('section1', 'db_passwd')
-g_user = config.get('section1', 'g_user')
-g_passwd = config.get('section1', 'g_passwd')
-db_user = db_user.decode('base64','strict')
-db_passwd = db_passwd.strip("'")
-email = g_user.decode('base64','strict')
-password = g_passwd.decode('base64','strict')[0:15]
-chdb_user = config.get('section1', 'chdb_user')
-chdb_user = chdb_user.strip("'")
-chdb_passwd = config.get('section1', 'chdb_passwd')
-chdb_passwd = chdb_passwd.strip("'")
-###############################################################
 
 # a function to get the current Grid usage from an eGauge device 
 def getData(building):
@@ -43,7 +27,7 @@ def getData(building):
     for meter in tree.findall( 'meter' ):
         title = meter.attrib['title']
         if title == "Grid":
-            currentPower = round(float(meter.findtext("power"))/1000, 2)
+            currentPower = abs(round(float(meter.findtext("power"))/1000, 2))
     return currentPower
 
 # call the data for each building
@@ -55,11 +39,10 @@ for i in buildingList:
 
 
 #update dials google spreadsheet
-json_key = json.load(open('/home/gfiske/Data/python_scripts/raspPi-e0a08639ebab.json'))
+#json_key = json.load(open('/root/python_scripts/energy-whoi-74fc1f82a002.json'))
 scope = ['https://spreadsheets.google.com/feeds']
-credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('/root/python_scripts/energy-whoi-74fc1f82a002.json', scope)
 g = gspread.authorize(credentials)
-#g = gspread.login(email, password)
 worksheet = g.open('WHOI_dials').get_worksheet(0)
 worksheet.update_cell(2,1,str(currentUsage[0]))
 worksheet.update_cell(2,2,str(currentUsage[1]))
