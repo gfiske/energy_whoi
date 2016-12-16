@@ -26,25 +26,26 @@ except:
 def getData(building):
     eGauge = "eg-" + building + "-00.whoi.net"
     url = "http://" + eGauge + "/cgi-bin/egauge-show?m&n=2&s=59&C"
-    tree = ET.parse(urllib.urlopen(url)).getroot()
-    if len(tree.findall('meter')) == 0:
-        currentPower = 0
-    for c in tree.findall('data'):
-        columns = c.attrib['columns']
-        columns = int(columns) + 1    
-    grid = round(abs(float(tree[0][columns][0].text) / 3600) / 1000, 2)
-    powerUsed = grid
+    powerUsed = 0
+    try:
+        tree = ET.parse(urllib.urlopen(url)).getroot()
+        if len(tree.findall('meter')) == 0:
+            currentPower = 0
+        for c in tree.findall('data'):
+            columns = c.attrib['columns']
+            columns = int(columns) + 1    
+        grid = round(abs(float(tree[0][columns][0].text) / 3600) / 1000, 2)
+        powerUsed = grid
+    except:
+        pass
     return powerUsed
 
 # call the data for each building
 buildingList = ['bell', 'challenger', 'clark', 'fenno']
-try:
-    Usage = []
-    for i in buildingList:
-        #print str(i) + " last hour usage is: " + str(getData(i))
-        Usage.append(getData(i))
-except:
-    pass
+Usage = []
+for i in buildingList:
+    #print str(i) + " last hour usage is: " + str(getData(i))
+    Usage.append(getData(i))
 
 try:
     #----------------------------
