@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #WHOI_log_5min_frame_data_to_db.py
 #Greg Fiske
-#This script collected 5 minute level usage from each WHOI eGauge and inserts values into a postgresql database table
+#This script collects 5 minute level usage from each WHOI eGauge and inserts values into a postgresql database table
 #It also gets the live temperture for Woods Hole from an external spreadsheet
 #Dec 2016
 
