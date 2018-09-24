@@ -36,7 +36,10 @@ buildingList = ['bell', 'challenger', 'clark', 'fenno']
 currentUsage = []
 for i in buildingList:
     #print str(i) + " current usage is: " + str(getData(i))
-    currentUsage.append(getData(i))
+    try:
+        currentUsage.append(getData(i))
+    except:
+        currentUsage.append(0)
 
 
 #get yesterday's usage for this time for each building
